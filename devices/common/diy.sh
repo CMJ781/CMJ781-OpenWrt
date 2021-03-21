@@ -2,7 +2,6 @@
 #=================================================
 rm -Rf feeds/custom/diy
 rm -Rf feeds/packages/net/{smartdns,mwan3,miniupnpd,aria2,https-dns-proxy,shadowsocks-libev,frp,openvpn} feeds/luci/applications/luci-app-{dockerman,smartdns,frpc,frps}
-rm -Rf feeds/custom/luci-app-{ttyd,nft-qos}
 rm -Rf feeds/packages/utils/cgroupfs-mount
 ./scripts/feeds update luci packages custom
 ./scripts/feeds install -a
@@ -46,7 +45,7 @@ for ipk in $(find package/feeds/custom/* -maxdepth 0); do
 done
 sed -i 's/$(VERSION) &&/$(VERSION) ;/g' include/download.mk
 date=`date +%m.%d.%Y`
-sed -i "s/DISTRIB_DESCRIPTION.*/DISTRIB_DESCRIPTION='%D %C by CMJ781'/g" package/base-files/files/etc/openwrt_release
+sed -i "s/DISTRIB_DESCRIPTION.*/DISTRIB_DESCRIPTION='%D %V %C by GaryPang'/g" package/base-files/files/etc/openwrt_release
 sed -i "s/# REVISION:=x/REVISION:= $date/g" include/version.mk
 sed -i '$a cgi-timeout = 300' package/feeds/packages/uwsgi/files-luci-support/luci-webui.ini
 
