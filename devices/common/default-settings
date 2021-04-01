@@ -1,11 +1,5 @@
 #!/bin/sh
 
-echo "# ip6tables -t nat -A PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 53" >> /etc/firewall.user
-echo "# ip6tables -t nat -A PREROUTING -p tcp --dport 53 -j REDIRECT --to-ports 53" >> /etc/firewall.user
-echo "# iptables -t nat -A PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 53" >> /etc/firewall.user
-echo "# iptables -t nat -A PREROUTING -p tcp --dport 53 -j REDIRECT --to-ports 53" >> /etc/firewall.user
-echo "# iptables -t nat -I POSTROUTING -j MASQUERADE" >> /etc/firewall.user
-
 ln -sf /sbin/ip /usr/bin/ip
 
 sed -i '/openwrt_custom/d' /etc/opkg/distfeeds.conf
@@ -20,21 +14,13 @@ sed -i '/profile.d/d' /lib/upgrade/keep.d/base-files
 
 rm -rf /tmp/luci-*
 
-#sed -i '/S99opkg/d' /etc/crontabs/root
-#echo "0 4 * * * sh /etc/rc.d/S99opkg >/tmp/opkgupdate.log 2>&1" >> /etc/crontabs/root
+grep -q S99opkg /etc/crontabs/root ||
+	echo "0 4 * * * sh /etc/rc.d/S99opkg >/tmp/opkgupdate.log 2>&1" >> /etc/crontabs/root
 
 uci set system.@rngd[0].enabled="1"
 uci del system.ntp.server
 uci add_list system.ntp.server='ntp.aliyun.com'
-uci add_list system.ntp.server='time1.cloud.tencent.com'
-uci add_list system.ntp.server='time2.cloud.tencent.com'
-uci add_list system.ntp.server='time3.cloud.tencent.com'
-uci add_list system.ntp.server='time4.cloud.tencent.com'
-uci add_list system.ntp.server='time5.cloud.tencent.com'
-uci add_list system.ntp.server='ntp.ntsc.ac.cn'
-uci add_list system.ntp.server='cn.ntp.org.cn'
-uci add_list system.ntp.server='time.windows.com'
-uci add_list system.ntp.server='time.apple.com'
+uci add_list system.ntp.server='0.openwrt.pool.ntp.org'
 uci commit system
 
 uci set uhttpd.main.rfc1918_filter=0
@@ -69,7 +55,7 @@ if [ ! -f /etc/config/placeholder ]; then
   uci set fstab.@global[0].anon_mount=1
   uci commit fstab
   sed -i 's/root:.*/root:$1$tTPCBw1t$ldzfp37h5lSpO9VXk4uUE\/:18336:0:99999:7:::/g' /etc/shadow
-  uci set network.lan.ipaddr="192.168.8.250"
+  uci set network.lan.ipaddr="10.0.0.1"
   uci commit network
 
   uci set network.@globals[0].packet_steering=1
@@ -96,4 +82,3 @@ chmod +x /www/luci
 sed -i "s/git-.*-\(.*\)/git-\1/g" /usr/lib/lua/luci/version.lua
 
 ln -s /sbin/poweroff /sbin/shutdown
-
