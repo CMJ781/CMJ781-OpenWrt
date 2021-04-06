@@ -40,7 +40,15 @@ test $version -lt 1 && {
 		uci set system.@system[0].timezone='CST-8'
 		uci del system.ntp.server
 		uci add_list system.ntp.server='ntp.aliyun.com'
-		uci add_list system.ntp.server='0.openwrt.pool.ntp.org'
+		uci add_list system.ntp.server='time1.cloud.tencent.com'
+		uci add_list system.ntp.server='time2.cloud.tencent.com'
+		uci add_list system.ntp.server='time3.cloud.tencent.com'
+		uci add_list system.ntp.server='time4.cloud.tencent.com'
+		uci add_list system.ntp.server='time5.cloud.tencent.com'
+		uci add_list system.ntp.server='ntp.ntsc.ac.cn'
+		uci add_list system.ntp.server='cn.ntp.org.cn'
+		uci add_list system.ntp.server='time.windows.com'
+		uci add_list system.ntp.server='time.apple.com'
 		uci commit system
 	}
 
@@ -59,9 +67,6 @@ test $version -lt 1 && {
 	
 	uci set upnpd.config.enabled='1'
 	uci commit upnpd
-
-	grep -q S99opkg /etc/crontabs/root ||
-		echo "0 4 * * * sh /etc/rc.d/S99opkg >/tmp/opkgupdate.log 2>&1" >> /etc/crontabs/root
 	
 	grep -q log-facility /etc/dnsmasq.conf ||
 		echo "log-facility=/dev/null" >> /etc/dnsmasq.conf
@@ -77,7 +82,7 @@ test $version -lt 1 && {
  
 	sed -i 's/root:.*/root:$1$tTPCBw1t$ldzfp37h5lSpO9VXk4uUE\/:18336:0:99999:7:::/g' /etc/shadow
  
-	uci set network.lan.ipaddr="10.0.0.1"
+	uci set network.lan.ipaddr="192.168.8.250"
 	uci set network.@globals[0].packet_steering=1
 	uci commit network
   
