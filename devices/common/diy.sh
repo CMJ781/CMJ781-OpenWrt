@@ -10,10 +10,10 @@ sed -i 's/Os/O2/g' include/target.mk
 rm -Rf tools/upx && svn co https://github.com/coolsnowwolf/lede/trunk/tools/upx tools/upx
 rm -Rf tools/ucl && svn co https://github.com/coolsnowwolf/lede/trunk/tools/ucl tools/ucl
 sed -i 's?zstd$?zstd ucl upx\n$(curdir)/upx/compile := $(curdir)/ucl/compile?g' tools/Makefile
-rm -rf package/network/services/ppp
-svn co https://github.com/openwrt/openwrt/trunk/package/network/services/ppp package/network/services/ppp
 echo -e "\q" | svn co https://github.com/immortalwrt/immortalwrt/branches/master/target/linux/generic/hack-5.4 target/linux/generic/hack-5.4
 wget -O target/linux/generic/pending-5.4/601-add-kernel-imq-support.patch https://raw.githubusercontent.com/immortalwrt/immortalwrt/master/target/linux/generic/pending-5.4/601-add-kernel-imq-support.patch
+rm -rf package/network/services/ppp
+svn co https://github.com/openwrt/openwrt/trunk/package/network/services/ppp package/network/services/ppp
 sed -i "s/'class': 'table'/'class': 'table memory'/g" package/*/*/luci-mod-status/htdocs/luci-static/resources/view/status/include/20_memory.js
 sed -i 's/+acme\( \|$\)/+acme +acme-dnsapi\1/g' package/*/*/luci-app-acme/Makefile
 sed -i '$a /etc/sysupgrade.conf' package/base-files/files/lib/upgrade/keep.d/base-files-essential
@@ -35,7 +35,6 @@ wget -O package/network/config/firewall/patches/fullconenat.patch https://github
 sed -i "s/+nginx\( \|$\)/+nginx-ssl\1/g"  package/*/*/*/Makefile
 sed -i 's/+python\( \|$\)/+python3/g' package/*/*/*/Makefile
 sed -i 's?../../lang?$(TOPDIR)/feeds/packages/lang?g' package/feeds/custom/*/Makefile
-sed -i 's?+pdnsd-alt??' package/feeds/custom/luci-app-turboacc/Makefile
 sed -i 's/PKG_BUILD_DIR:=/PKG_BUILD_DIR?=/g' feeds/luci/luci.mk
 sed -i 's?admin/status/channel_analysis??' package/feeds/luci/luci-mod-status/root/usr/share/luci/menu.d/luci-mod-status.json
 sed -i '/killall -HUP/d' feeds/luci/luci.mk
@@ -47,7 +46,7 @@ for ipk in $(find package/feeds/custom/* -maxdepth 0); do
 	fi	
 done
 sed -i 's/$(VERSION) &&/$(VERSION) ;/g' include/download.mk
-date=`date +%m.%d.%Y`
+date=`date +%Y%m%d`
 sed -i "s/DISTRIB_DESCRIPTION.*/DISTRIB_DESCRIPTION='%D %C by CMJ781'/g" package/base-files/files/etc/openwrt_release
 sed -i "s/# REVISION:=x/REVISION:= $date/g" include/version.mk
 sed -i '$a cgi-timeout = 300' package/feeds/packages/uwsgi/files-luci-support/luci-webui.ini
