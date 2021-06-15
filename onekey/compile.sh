@@ -45,21 +45,13 @@ echo "
 
 1. X86_64
 
-2. K2p
+2. r2s
 
-3. K2p 32M
+3. r4s
 
-4. RedMi_AC2100
+4. Rpi-4B
 
-5. r2s
-
-6. r4s
-
-7. newifi-d2
-
-8. XY-C5
-
-9. Exit
+5. Exit
 
 "
 
@@ -73,54 +65,35 @@ case $CHOOSE in
 	break
 	;;
 	2)
-		firmware="phicomm-k2p"
-	break
-	;;
-	3)
-		firmware="k2p-32m-usb"
-	break
-	;;
-	4)
-		firmware="redmi-ac2100"
-	break
-	;;
-	5)
 		firmware="nanopi-r2s"
 	break
 	;;
-	6)
+	3)
 		firmware="nanopi-r4s"
 	break
 	;;
-	7)
-		firmware="newifi-d2"
+	4)
+		firmware="Rpi-4B"
 	break
 	;;
-	8)
-		firmware="XY-C5"
-	break
-	;;
-	9)	exit 0
+	5)	exit 0
 	;;
 
 esac
 done
 
-if [[ $firmware =~ (redmi-ac2100|phicomm-k2p|newifi-d2|k2p-32m-usb|XY-C5|xiaomi-r3p) ]]; then
-		git clone -b openwrt-21.02 --depth 1 https://github.com/openwrt/openwrt
-		svn co https://github.com/garypang13/Actions-OpenWrt/trunk/devices openwrt/devices
-		cd openwrt
-		wget -cO sdk.tar.xz https://mirrors.cloud.tencent.com/openwrt/releases/21.02-SNAPSHOT/targets/ramips/mt7621/openwrt-sdk-21.02-SNAPSHOT-ramips-mt7621_gcc-8.4.0_musl.Linux-x86_64.tar.xz
-elif [[ $firmware =~ (nanopi-r2s|nanopi-r4s) ]]; then
-		git clone -b openwrt-21.02 --depth 1 https://github.com/openwrt/openwrt
-		svn co https://github.com/garypang13/Actions-OpenWrt/trunk/devices openwrt/devices
+git clone -b openwrt-21.02 --depth 1 https://github.com/openwrt/openwrt
+svn co https://github.com/garypang13/OpenWrt/trunk/devices openwrt/devices
+
+if [[ $firmware =~ (nanopi-r2s|nanopi-r4s) ]]; then
 		cd openwrt
 		wget -cO sdk.tar.xz https://mirrors.cloud.tencent.com/openwrt/releases/21.02-SNAPSHOT/targets/rockchip/armv8/openwrt-sdk-21.02-SNAPSHOT-rockchip-armv8_gcc-8.4.0_musl.Linux-x86_64.tar.xz
 elif [[ $firmware == "x86_64" ]]; then
-		git clone -b openwrt-21.02 --depth 1 https://github.com/openwrt/openwrt
-		svn co https://github.com/garypang13/Actions-OpenWrt/trunk/devices openwrt/devices
 		cd openwrt
 		wget -cO sdk.tar.xz https://mirrors.cloud.tencent.com/openwrt/releases/21.02-SNAPSHOT/targets/x86/64/openwrt-sdk-21.02-SNAPSHOT-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
+elif [[ $firmware == "Rpi-4B" ]]; then
+		cd openwrt
+		wget -cO sdk.tar.xz https://mirrors.cloud.tencent.com/openwrt/releases/21.02-SNAPSHOT/targets/bcm27xx/bcm2711/openwrt-sdk-21.02-SNAPSHOT-bcm27xx-bcm2711_gcc-8.4.0_musl.Linux-x86_64.tar.xz
 fi
 
 
@@ -148,10 +121,10 @@ if [ -f "devices/$firmware/default-settings" ]; then
 	cat -f devices/$firmware/default-settings >> package/*/*/default-settings/files/uci.defaults
 fi
 if [ -n "$(ls -A "devices/common/patches" 2>/dev/null)" ]; then
-          find "devices/common/patches" -type f -name '*.patch' -print0 | sort -z | xargs -I % -t -0 -n 1 sh -c "cat '%'  | patch -d './' -p1 --forward"
+          find "devices/common/patches" -type f -name '*.patch' ! -name '*.revert.patch' -print0 | sort -z | xargs -I % -t -0 -n 1 sh -c "cat '%'  | patch -d './' -p1 --forward"
 fi
 if [ -n "$(ls -A "devices/$firmware/patches" 2>/dev/null)" ]; then
-          find "devices/$firmware/patches" -type f -name '*.patch' -print0 | sort -z | xargs -I % -t -0 -n 1 sh -c "cat '%'  | patch -d './' -p1 --forward"
+          find "devices/$firmware/patches" -type f -name '*.patch' ! -name '*.revert.patch' -print0 | sort -z | xargs -I % -t -0 -n 1 sh -c "cat '%'  | patch -d './' -p1 --forward"
 fi
 cp devices/common/.config .config
 echo >> .config
