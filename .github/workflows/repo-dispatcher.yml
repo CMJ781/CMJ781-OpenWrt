@@ -79,3 +79,4 @@ jobs:
               -d '{"event_type": "nanopi-r4s ${{ env.SSH }}", "client_payload": {"target": "nanopi-r4s"}}'
             fi
         fi
+
